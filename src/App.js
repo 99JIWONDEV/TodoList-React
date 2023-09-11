@@ -3,6 +3,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import TodoTemplate from './components/TodoTemplate';
 import TodoInsert from './components/TodoInsert';
 import TodoList from './components/TodoList';
+import ToDoEdit from './components/ToDoEdit';
 
 const App = () => {
   const [todos, setTodos] = useState([
@@ -54,11 +55,42 @@ const App = () => {
   ,[todos],
   );
 
+  const [selectedTodo, setSelectedTodo] = useState(null);
+  const [insertToggle, setInsertToggle] = useState(false);
+
+  const onInsertToggle = () => {
+    if (selectedTodo) {
+      setSelectedTodo(null);
+    }
+    setInsertToggle((prev) => !prev);
+  };
+  const onChangeSelectedTodo = (todo) => {
+    setSelectedTodo(todo);
+  };
+
+  const onUpdate = (id, text) => {
+    onInsertToggle();
+    
+    setTodos(todos.map((todo) => (todo.id === id ? { ...todo, text } : todo)));
+  };
+
   return (
     <TodoTemplate>
       <TodoInsert onInsert={onInsert} />
-      <TodoList todos={todos} onRemove={onRemove} onToggle={onToggle}/>
+      <TodoList todos={todos} onRemove={onRemove} onToggle={onToggle} onChangeSelectedTodo={onChangeSelectedTodo} onInsertToggle={onInsertToggle}/>
+      {insertToggle && (
+        <ToDoEdit
+          onInsert={onInsert}
+          selectedTodo={selectedTodo}
+          onInsertToggle={onInsertToggle}
+          onUpdate={onUpdate}
+          insertToggle={insertToggle}
+        />
+      )}
+
+
     </TodoTemplate>
+    
   );
 };
 
